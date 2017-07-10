@@ -1,9 +1,14 @@
 from django.contrib import messages
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import (authenticate, login, logout,
+                                 update_session_auth_hash)
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+
+from . import models
+from . import forms
 
 
 def sign_in(request):
@@ -16,7 +21,7 @@ def sign_in(request):
                 if user.is_active:
                     login(request, user)
                     return HttpResponseRedirect(
-                        reverse('home')  # TODO: go to profile
+                        reverse('accounts:profile')  # TODO: go to profile
                     )
                 else:
                     messages.error(
@@ -54,3 +59,44 @@ def sign_out(request):
     logout(request)
     messages.success(request, "You've been signed out. Come back soon!")
     return HttpResponseRedirect(reverse('home'))
+
+
+@login_required
+def profile(request):
+    try:
+        profile = models.UserProfile.objects.get(user=request.user)
+    except models.UserProfile.DoesNotExist:
+        profile = models.UserProfile()
+        profile.user = request.user
+    return render(request, 'accounts/profile.html', {'profile': profile})
+
+
+@login_required
+def edit_profile(request):
+    try:
+        profile = models.UserProfile.objects.get(user=request.user)
+    except models.UserProfile.DoesNotExist:
+        profile = models.UserProfile()
+        profile.user = request.user
+    form = forms.UserProfileForm(instance=profile,
+                                 initial={'email2': profile.email})
+    if request.method == 'POST':
+        form = forms.UserProfileForm(request.POST, request.FILES,
+                                     instance=profile)
+        if form.is_valid():
+            # import pdb; pdb.set_trace()
+            form.save()
+            return HttpResponseRedirect(reverse('accounts:profile'))
+    return render(request, 'accounts/edit_profile.html', {'form': form})
+
+
+@login_required
+def change_password(request):
+    form = forms.CustomPasswordChangeForm(request.user)
+    if request.method == 'POST':
+        form = forms.CustomPasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)
+            return HttpResponseRedirect(reverse('accounts:profile'))
+    return render(request, 'accounts/change_password.html', {'form': form})

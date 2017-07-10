@@ -22,7 +22,7 @@
     <!-- CSS
     –––––––––––––––––––––––––––––––––––––––––––––––––– -->
     <link rel="stylesheet" href="{% static "css/global.css" %}">
-
+    {% block css %}{% endblock %}
     <!-- JS
     –––––––––––––––––––––––––––––––––––––––––––––––––– -->
     <script type="text/javascript"
@@ -45,22 +45,22 @@
             <div class="circle--fluid--cell circle--fluid--primary">
                 <nav>
                     <ul class="circle--inline">
-                        <li><a href="#">nav</a></li>
-                        <li><a href="#">here?</a></li>
+                        <li><a href="{% url 'accounts:profile' %}">Profile</a></li>
+                        <li><a href="#">Friends</a></li>
                     </ul>
                 </nav>
             </div>
             <div class="circle--fluid--cell circle--fluid--secondary">
                 <nav>
                     <ul class="circle--inline">
-                        {% if not user.is_authenticated %}
-                            <li><a href="{% url 'accounts:sign_up' %}">Sign Up</a></li>
-                            <li><a href="{% url 'accounts:sign_in' %}">Sign
-                                In</a></li>
-                        {% else %}
+                        {% if user.is_authenticated %}
                             <!-- view profile link here? -->
                             <!-- edit profile link here? -->
                             <li><a href="{% url 'accounts:sign_out' %}">Sign Out</a></li>
+                        {% else %}
+                            <li><a href="{% url 'accounts:sign_up' %}">Sign Up</a></li>
+                            <li><a href="{% url 'accounts:sign_in' %}">Sign
+                                In</a></li>
                         {% endif %}
                     </ul>
                 </nav>

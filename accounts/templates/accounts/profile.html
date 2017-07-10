@@ -1,0 +1,23 @@
+{% extends 'layout.html' %}
+{% load static from staticfiles %}
+
+{% block title %}Profile | {{ super }}{% endblock %}
+{% block css %}
+<link rel="stylesheet" href="{% static "accounts/css/styles.css" %}">
+{% endblock %}
+
+{% block body %}
+{% if profile.avatar %}
+<img src="{{ profile.avatar.url }}" alt="avatar" class="icon">
+{% else %}
+<img src="{% static 'images/userDefaultIcon.png' %}" alt="avatar" class="icon">
+{% endif %}
+<p>Username: {{ profile.user.username }}</p>
+<p>First Name: {{ profile.first_name }}</p>
+<p>Last Name: {{ profile.last_name }}</p>
+<p>Email: {{ profile.email }}</p>
+<p>Birthday: {{ profile.birthday|default:'' }}</p>
+<p>Bio:</p><p>{{ profile.bio }}</p>
+<a href="{% url 'accounts:edit' %}" class="button">Edit</a>
+<a href="{% url 'accounts:change_password' %}" class="button">Change Password</a>
+{% endblock %}
