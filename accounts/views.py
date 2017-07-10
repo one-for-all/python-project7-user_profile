@@ -84,8 +84,8 @@ def edit_profile(request):
         form = forms.UserProfileForm(request.POST, request.FILES,
                                      instance=profile)
         if form.is_valid():
-            # import pdb; pdb.set_trace()
             form.save()
+            messages.success(request, "Profile Updated!")
             return HttpResponseRedirect(reverse('accounts:profile'))
     return render(request, 'accounts/edit_profile.html', {'form': form})
 
@@ -97,6 +97,7 @@ def change_password(request):
         form = forms.CustomPasswordChangeForm(request.user, request.POST)
         if form.is_valid():
             user = form.save()
+            messages.success(request, "Password Updated!")
             update_session_auth_hash(request, user)
             return HttpResponseRedirect(reverse('accounts:profile'))
     return render(request, 'accounts/change_password.html', {'form': form})
