@@ -1,2 +1,6 @@
+.DS_Store
+project7_env
+.idea
+*.pyc
 
 
